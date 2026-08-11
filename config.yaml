@@ -1,0 +1,65 @@
+# ── ur: autonomous EURUSD trader ──────────────────────────────────────
+
+symbol: EURUSD
+
+# Bottles / MT5 terminal
+bottle:
+  name: mt5
+  runner: soda-9.0-1                     # wine runner in ~/.local/share/bottles/runners
+  terminal_path: "C:\\Program Files\\MetaTrader 5\\terminal64.exe"
+  wine_python: "C:\\Python310\\python.exe"
+  prefix: "~/.local/share/bottles/bottles/mt5"
+
+# Execution
+execution:
+  mode: live                            # live | paper | dry
+  launch: true                          # auto-launch the MT5 terminal if not running
+  magic: 4771
+  comment: "ur-auto"
+  deviation_points: 30
+  max_spread_points: 35
+  retries: 3
+
+# Risk
+risk:
+  risk_percent: 1.0                     # % of equity risked per trade
+  sl_atr_mult: 1.5                      # SL = mult * ATR
+  tp1_atr_mult: 3.0                     # TP1 = mult * ATR  (1:2 RR minimum)
+  min_rr: 2.0
+  lot_override: 0.47                    # fixed lot (0 = use risk-based sizing)
+  max_lot: 5.0
+  paper_balance: 10000.0                # equity used for sizing in paper mode
+
+# Signal weights (must sum to 1.0)
+weights:
+  technical: 0.30                       # local indicators (RSI/MACD/EMA/ATR/BB from Yahoo 1h)
+  tradingview: 0.20                     # TradingView technical-analysis summary
+  news: 0.20                            # Forex Factory economic calendar
+  flow: 0.15                            # CFTC COT positioning + options flow
+  cross_asset: 0.15                     # DXY / VIX / US yields regime
+
+# Data sources
+sources:
+  forex_factory_url: "https://www.forexfactory.com/calendar?day=today"
+  news_csv_fallback:
+    - "/home/muchacho/Desktop/forex_factory_usd_news_2025_2026.csv"
+    - "/home/muchacho/Desktop/forex_factory_eur_news_2025_2026.csv"
+    - "/home/muchacho/Documents/forex_factory_usd_news_2025_2026.csv"
+    - "/home/muchacho/Documents/forex_factory_eur_news_2025_2026.csv"
+  tradingview_widget: "https://www.tradingview.com/widgetembed/?frame=technicalanalysis&symbol=FX:EURUSD&interval=1D"
+  yahoo_chart: "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1h&range=5d"
+  cftc_api: "https://publicreporting.cftc.gov/resource/6dca-aqww.json"
+  cross_asset_tickers:
+    DXY: "DX-Y.NYB"
+    VIX: "^VIX"
+    US10Y: "^TNX"
+
+# Keys file (github, deriv, deepseek, ...) — NEVER committed
+keys_file: "/home/muchacho/Documents/DETAIL/apis.txt"
+
+# Optional AI overlay for decision robustness (uses deepseek key in keys_file)
+llm:
+  enabled: true
+  provider: deepseek
+  model: "deepseek-chat"
+  timeout: 25

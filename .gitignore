@@ -1,0 +1,14 @@
+# secrets
+apis.txt
+*.key
+.env
+
+# runtime
+logs/
+__pycache__/
+*.pyc
+paper_trades.json
+
+# local
+.venv/
+venv/
