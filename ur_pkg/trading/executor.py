@@ -51,6 +51,18 @@ if info is None:
     print(json.dumps({{"ok": False, "error": "no-account:" + str(mt5.last_error())}}))
     mt5.shutdown(); sys.exit(0)
 
+# ── SAFETY: only ever trade demo/paper accounts, never live money ──
+try:
+    server = (info.server or "").lower()
+    trade_mode = int(getattr(info, "trade_mode", -1))
+except Exception:
+    server, trade_mode = "", -1
+# ACCOUNT_TRADE_MODE_DEMO == 1
+if trade_mode != 1 and "demo" not in server:
+    print(json.dumps({{"ok": False, "error": "refusing-non-demo-account "
+                       "(server='%s' mode=%s)" % (info.server, trade_mode)}}))
+    mt5.shutdown(); sys.exit(0)
+
 request = {{
     "action": mt5.TRADE_ACTION_DEAL,
     "symbol": "{cfg['symbol']}",

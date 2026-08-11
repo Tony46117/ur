@@ -101,7 +101,6 @@ def decide(cfg: dict, data: dict) -> dict:
 
     # ATR for SL/TP — real ATR(14) from local indicators when available
     atr = _get_atr(data)
-    pip = 0.0001
     sl_dist = atr * cfg["risk"]["sl_atr_mult"]
     tp_dist = atr * cfg["risk"]["tp1_atr_mult"]
 
