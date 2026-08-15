@@ -14,6 +14,7 @@ Flags:
   --dry-run            analyze only; print decision, do NOT execute
   --diagram            generate architecture diagram and exit
   --no-launch          do not try to launch the MT5 terminal
+  --check              diagnose the MT5 connection/account and exit
   --verbose            debug logging
 """
 
@@ -37,6 +38,7 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--diagram", action="store_true")
     ap.add_argument("--no-launch", action="store_true")
+    ap.add_argument("--check", action="store_true")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
 
@@ -70,13 +72,30 @@ def main() -> int:
     terminal = ensure_terminal(cfg)
     log.ok(f"MT5 terminal: {terminal['state']} (build {terminal.get('build') or '?'})")
 
+    # ── 2b. Diagnose the MT5 connection/account (--check) ─────────
+    if args.check:
+        from ur_pkg.trading.executor import check_connection
+        res = check_connection(cfg)
+        if not res.get("ok"):
+            log.err(f"MT5 check failed: {res.get('error')}")
+            return 1
+        acc = res.get("account")
+        if acc:
+            log.ok(f"MT5 connected: build {res.get('build')}, "
+                   f"account {acc['login']} @ {acc['server']} "
+                   f"(mode {acc['trade_mode']}, balance {acc['balance']} {acc['currency']})")
+        else:
+            log.err(f"MT5 terminal reachable but NOT logged in: {res.get('error')}")
+            return 1
+        return 0
+
     # ── 3. Collect live market data ───────────────────────────────
     from ur_pkg.collector import collect_all
     data = collect_all(cfg)
-    log.info(f"Data: spot={data['spot'].get('source')} tv={data['tv'].get('available')} "
+    log.info(f"Data: spot={data['spot'].get('source')} tv={data['tradingview'].get('available')} "
              f"tech={data['technical'].get('available')} "
              f"news_events={data['news'].get('events_analyzed')} "
-             f"cot={data['cme'].get('available')} cross={data['cross'].get('available')}")
+             f"flow={data['flow'].get('available')} cross={data['cross_asset'].get('available')}")
 
     # ── 4. Decide ─────────────────────────────────────────────────
     from ur_pkg.signals.fusion import decide

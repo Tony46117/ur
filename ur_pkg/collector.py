@@ -25,19 +25,29 @@ def collect_all(cfg: dict) -> dict:
             log.err(f"{name} source failed: {e}")
             results[name] = {"available": False, "error": str(e)[:120]}
 
+    # NOTE: result keys MUST match the weights keys in config.yaml
+    # (technical / tradingview / news / flow / cross_asset) — fusion.py
+    # looks them up by name, so a mismatch silently drops the source.
+    SOURCES = [
+        ("spot", spot.get_spot),
+        ("tradingview", tradingview.get_tv_summary),
+        ("technical", technical.get_technical_signal),
+        ("news", news.get_news_signal),
+        ("flow", cme.get_flow_signal),
+        ("cross_asset", cross_asset.get_cross_signal),
+    ]
     threads = [
-        threading.Thread(target=worker, args=("spot", spot.get_spot)),
-        threading.Thread(target=worker, args=("tv", tradingview.get_tv_summary)),
-        threading.Thread(target=worker, args=("technical", technical.get_technical_signal)),
-        threading.Thread(target=worker, args=("news", news.get_news_signal)),
-        threading.Thread(target=worker, args=("cme", cme.get_flow_signal)),
-        threading.Thread(target=worker, args=("cross", cross_asset.get_cross_signal)),
+        threading.Thread(target=worker, args=(name, fn), daemon=True)
+        for name, fn in SOURCES
     ]
     for t in threads:
         t.start()
     for t in threads:
         t.join(timeout=45)
 
-    # spot is the anchor — other modules may need it
-    results.setdefault("spot", {"available": False})
+    # Guarantee every expected key exists — a collector thread that exceeds
+    # the join timeout (or dies before storing) would otherwise cause a
+    # KeyError downstream in ur.py / fusion.py. spot is the anchor.
+    for name, _ in SOURCES:
+        results.setdefault(name, {"available": False, "error": "collector timeout"})
     return results

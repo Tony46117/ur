@@ -12,6 +12,7 @@ pip install -r requirements.txt
 python3 ur.py            # full run: launch → collect → decide → execute
 python3 ur.py --dry-run  # analyze only, no order
 python3 ur.py --lot 0.47 # fixed lot override
+python3 ur.py --check    # diagnose MT5 connection + account, then exit
 python3 ur.py --diagram  # regenerate architecture diagram
 ```
 
@@ -29,7 +30,7 @@ ur.py → launcher (bottles-cli → mt5 bottle → MT5 terminal)
 
 | Source | Data | Fallback |
 |---|---|---|
-| Forex Factory | economic calendar (high/medium USD+EUR) | local news CSVs |
+| Forex Factory | economic calendar (high/medium USD+EUR) | JSON mirror → local news CSVs |
 | TradingView | TA widget summary (oscillators/MAs) | — |
 | Yahoo Finance | live EURUSD spot, DXY, VIX, US10Y | — |
 | CFTC COT API | Euro FX open interest + net positioning | — |
@@ -43,6 +44,17 @@ ur.py → launcher (bottles-cli → mt5 bottle → MT5 terminal)
   (error -6), or the account isn't logged in, it records a **paper fill**
   to `paper_trades.json` instead and tells you why.
 - **paper**: simulates the fill (default when `execution.mode: paper`).
+
+## MT5 account
+
+Set `mt5.login` / `mt5.password` / `mt5.server` in `config.yaml` (or
+`mt5_login` / `mt5_password` / `mt5_server` in `apis.txt`) and ur will
+log the terminal in automatically before trading. Only **demo/paper**
+accounts are ever accepted — live-money accounts are refused.
+
+If the terminal fails to authorize (e.g. *Invalid account*), ur warns you
+at startup and falls back to paper fills. Run `python3 ur.py --check` to
+see exactly which account (if any) is connected.
 
 ## Config
 

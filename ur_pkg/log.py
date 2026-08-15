@@ -52,8 +52,12 @@ class _Log:
         print("-" * 70, flush=True)
 
     def banner(self):
+        try:
+            from ur_pkg import __version__
+        except ImportError:
+            __version__ = "?"
         self.line()
-        self.info("ur  v1.0.0  —  autonomous EURUSD trader")
+        self.info(f"ur  v{__version__}  —  autonomous EURUSD trader")
         self.line()
 
 

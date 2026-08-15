@@ -20,6 +20,12 @@ def get_cross_signal(cfg: dict) -> dict:
         except Exception as e:
             values[name] = {"available": False, "error": str(e)[:80]}
 
+    # available only if at least one ticker actually loaded
+    if not any(isinstance(v, dict) and v.get("available") is not False for v in values.values()):
+        return {"available": False, "score": 50, "direction": "NEUTRAL",
+                "values": values, "note": "cross-asset data unavailable",
+                "error": "all tickers failed"}
+
     # Risk regime logic for EURUSD
     dxy = values.get("DXY", {}).get("chg_pct")
     vix = values.get("VIX", {}).get("price")

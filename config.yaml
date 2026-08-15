@@ -20,6 +20,14 @@ execution:
   max_spread_points: 35
   retries: 3
 
+# MT5 account — OPTIONAL auto-login. When login is set, ur logs into the
+# terminal itself before placing orders (demo account only, enforced).
+# You can also put mt5_login / mt5_password / mt5_server in apis.txt.
+mt5:
+  login: ""          # e.g. 108775433
+  password: ""       # your demo account password
+  server: ""         # e.g. MetaQuotes-Demo
+
 # Risk
 risk:
   risk_percent: 1.0                     # % of equity risked per trade
@@ -38,9 +46,14 @@ weights:
   flow: 0.15                            # CFTC COT positioning + options flow
   cross_asset: 0.15                     # DXY / VIX / US yields regime
 
+# News signal tuning
+news_window_back: 1        # keep events up to N days before today
+news_window_ahead: 7       # keep events up to N days ahead
+
 # Data sources
 sources:
   forex_factory_url: "https://www.forexfactory.com/calendar?day=today"
+  forex_factory_json: "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
   news_csv_fallback:
     - "/home/muchacho/Desktop/forex_factory_usd_news_2025_2026.csv"
     - "/home/muchacho/Desktop/forex_factory_eur_news_2025_2026.csv"

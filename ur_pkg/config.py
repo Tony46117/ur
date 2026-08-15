@@ -15,6 +15,14 @@ def load_config(path: str) -> dict:
             (cfg["bottle"] if key == "prefix" else cfg).update({key: os.path.expanduser(val)})
 
     cfg["_keys"] = load_keys(cfg.get("keys_file"))
+
+    # MT5 auto-login: config `mt5:` block wins, else apis.txt mt5_* keys
+    mt5 = cfg.setdefault("mt5", {})
+    keys = cfg["_keys"]
+    for k, key_name in (("login", "mt5_login"), ("password", "mt5_password"),
+                        ("server", "mt5_server")):
+        if not mt5.get(k) and keys.get(key_name):
+            mt5[k] = keys[key_name]
     return cfg
 
 
