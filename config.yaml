@@ -55,10 +55,10 @@ sources:
   forex_factory_url: "https://www.forexfactory.com/calendar?day=today"
   forex_factory_json: "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
   news_csv_fallback:
-    - "/home/muchacho/Desktop/forex_factory_usd_news_2025_2026.csv"
-    - "/home/muchacho/Desktop/forex_factory_eur_news_2025_2026.csv"
-    - "/home/muchacho/Documents/forex_factory_usd_news_2025_2026.csv"
-    - "/home/muchacho/Documents/forex_factory_eur_news_2025_2026.csv"
+    - "~/Desktop/forex_factory_usd_news_2025_2026.csv"
+    - "~/Desktop/forex_factory_eur_news_2025_2026.csv"
+    - "~/Documents/forex_factory_usd_news_2025_2026.csv"
+    - "~/Documents/forex_factory_eur_news_2025_2026.csv"
   tradingview_widget: "https://www.tradingview.com/widgetembed/?frame=technicalanalysis&symbol=FX:EURUSD&interval=1D"
   yahoo_chart: "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1h&range=5d"
   cftc_api: "https://publicreporting.cftc.gov/resource/6dca-aqww.json"
@@ -68,7 +68,7 @@ sources:
     US10Y: "^TNX"
 
 # Keys file (github, deriv, deepseek, ...) — NEVER committed
-keys_file: "/home/muchacho/Documents/DETAIL/apis.txt"
+keys_file: "~/Documents/DETAIL/apis.txt"
 
 # Optional AI overlay for decision robustness (uses deepseek key in keys_file)
 llm:

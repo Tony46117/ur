@@ -14,6 +14,14 @@ def load_config(path: str) -> dict:
         if isinstance(val, str) and val.startswith("~"):
             (cfg["bottle"] if key == "prefix" else cfg).update({key: os.path.expanduser(val)})
 
+    # expand ~ in news CSV fallback paths
+    fb = cfg.get("sources", {}).get("news_csv_fallback")
+    if isinstance(fb, list):
+        cfg.setdefault("sources", {})["news_csv_fallback"] = [
+            os.path.expanduser(p) if isinstance(p, str) and p.startswith("~") else p
+            for p in fb
+        ]
+
     cfg["_keys"] = load_keys(cfg.get("keys_file"))
 
     # MT5 auto-login: config `mt5:` block wins, else apis.txt mt5_* keys
